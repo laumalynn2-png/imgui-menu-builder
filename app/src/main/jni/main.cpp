@@ -11,6 +11,7 @@
 #include <utility>
 
 #include <android/log.h>
+#include <android/native_window.h>
 
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
@@ -35,6 +36,7 @@ int screenHeight = 0;
 bool g_Initialized = false;
 
 static JavaVM* g_jvm = NULL;
+static ANativeWindow* g_nativeWindow = NULL;
 
 static std::string g_savePath;
 static std::string g_code;
@@ -697,7 +699,7 @@ static void UI() {
 // JNI declarations
 // ---------------------------------------------------------------------------
 extern "C" {
-    JNIEXPORT void JNICALL Java_com_qoder_imguibuilder_GLES3JNIView_init(JNIEnv* env, jclass cls);
+    JNIEXPORT void JNICALL Java_com_qoder_imguibuilder_GLES3JNIView_init(JNIEnv* env, jclass cls, jobject surface);
     JNIEXPORT void JNICALL Java_com_qoder_imguibuilder_GLES3JNIView_resize(JNIEnv* env, jobject obj, jint width, jint height);
     JNIEXPORT void JNICALL Java_com_qoder_imguibuilder_GLES3JNIView_step(JNIEnv* env, jobject obj);
     JNIEXPORT void JNICALL Java_com_qoder_imguibuilder_GLES3JNIView_imgui_1Shutdown(JNIEnv* env, jobject obj);
@@ -709,10 +711,12 @@ extern "C" {
 };
 
 JNIEXPORT void JNICALL
-Java_com_qoder_imguibuilder_GLES3JNIView_init(JNIEnv* env, jclass cls) {
+Java_com_qoder_imguibuilder_GLES3JNIView_init(JNIEnv* env, jclass cls, jobject surface) {
     if (g_Initialized) return;
 
     env->GetJavaVM(&g_jvm);
+    if (surface && !g_nativeWindow)
+        g_nativeWindow = ANativeWindow_fromSurface(env, surface);
 
     // Setup ImGui context
     IMGUI_CHECKVERSION();
@@ -723,7 +727,7 @@ Java_com_qoder_imguibuilder_GLES3JNIView_init(JNIEnv* env, jclass cls) {
     ImGui::StyleColorsDark();
 
     // Setup Platform/Renderer backends
-    ImGui_ImplAndroid_Init(NULL);
+    ImGui_ImplAndroid_Init(g_nativeWindow);
     ImGui_ImplOpenGL3_Init("#version 300 es");
 
     // Embedded font (Custom3 array from FONTS/DEFAULT.h)
@@ -748,7 +752,8 @@ JNIEXPORT void JNICALL
 Java_com_qoder_imguibuilder_GLES3JNIView_step(JNIEnv* env, jobject obj) {
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplAndroid_NewFrame(screenWidth, screenHeight);
+    ImGui_ImplAndroid_NewFrame();
+    ImGui::GetIO().DisplaySize = ImVec2((float)screenWidth, (float)screenHeight);
     ImGui::NewFrame();
 
     if (!g_scaleApplied) {
@@ -771,6 +776,10 @@ Java_com_qoder_imguibuilder_GLES3JNIView_imgui_1Shutdown(JNIEnv* env, jobject ob
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplAndroid_Shutdown();
     ImGui::DestroyContext();
+    if (g_nativeWindow) {
+        ANativeWindow_release(g_nativeWindow);
+        g_nativeWindow = NULL;
+    }
     g_Initialized = false;
 }
 

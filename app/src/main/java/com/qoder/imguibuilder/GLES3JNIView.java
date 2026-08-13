@@ -30,7 +30,7 @@ public class GLES3JNIView extends GLSurfaceView implements GLSurfaceView.Rendere
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        init();
+        init(getHolder().getSurface());
     }
 
     @Override
@@ -49,7 +49,7 @@ public class GLES3JNIView extends GLSurfaceView implements GLSurfaceView.Rendere
         return super.onTouchEvent(event);
     }
 
-    public static native void init();
+    public static native void init(android.view.Surface surface);
     public static native void resize(int width, int height);
     public static native void step();
     public static native void imgui_Shutdown();
