@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_IMAGE);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
