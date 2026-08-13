@@ -12,6 +12,7 @@
 
 #include <android/log.h>
 #include <android/native_window.h>
+#include <android/native_window_jni.h>
 
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
