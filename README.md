@@ -22,7 +22,7 @@ APKs are built automatically by GitHub Actions on every push to `main`. See the 
 | Gradle       | 7.5.1         |
 | NDK          | 25.2.9519653  |
 | compileSdk   | 33            |
-| minSdk       | 21            |
+| minSdk       | 26            |
 
 Build locally with:
 
