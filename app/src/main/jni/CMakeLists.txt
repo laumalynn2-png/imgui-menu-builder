@@ -13,9 +13,11 @@ add_library(builder SHARED
 
 find_library(log-lib log)
 
+target_compile_definitions(builder PRIVATE IMGUI_IMPL_OPENGL_ES3)
+
 target_include_directories(builder PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/ImGui
     ${CMAKE_CURRENT_SOURCE_DIR}/ImGui/backends)
 
-target_link_libraries(builder android EGL GLESv2 ${log-lib})
+target_link_libraries(builder android EGL GLESv3 ${log-lib})
